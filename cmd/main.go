@@ -1,10 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"github.com/kwakubiney/bank-transfer/internal/config"
+	"github.com/kwakubiney/bank-transfer/internal/domain/repository"
+	"github.com/kwakubiney/bank-transfer/internal/handler"
 	"github.com/kwakubiney/bank-transfer/internal/postgres"
 	"github.com/kwakubiney/bank-transfer/internal/server"
-	"log"
 )
 
 func main() {
@@ -13,10 +16,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = postgres.Init()
+	db , err := postgres.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
-	server := server.New()
+
+	repo := repository.NewAccountRepository(db)
+	handlers := handler.NewHandler(repo)
+	server := server.New(handlers)
 	server.Start()
 }

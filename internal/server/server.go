@@ -8,20 +8,28 @@ import (
 	"os/signal"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kwakubiney/bank-transfer/internal/handler"
 )
 
 type Server struct {
 	e   *gin.Engine
 	srv http.Server
+	h *handler.Handler
 }
 
-func New() *Server {
+func New(h *handler.Handler) *Server {
 	return &Server{
 		e: gin.Default(),
+		h: h,
 	}
 }
 
 func (s *Server) SetupRoutes() *gin.Engine {
+	s.e.GET("/healthCheck", s.h.HealthCheck)
+	s.e.POST("/createAccount", s.h.CreateAccount)
+	s.e.POST("/withdraw", s.h.WithdrawFromAccount)
+	s.e.POST("/deposit", s.h.DepositToAccount)
+
 	return s.e
 }
 
