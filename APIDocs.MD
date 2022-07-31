@@ -81,29 +81,40 @@
 ----------------------------------------------|------------------------------------------------------------------------------
  **[400 or StatusBadRequest](#400)**          | Malformed parameters or other bad requests to the server.
  **[500 or StatusInternalServerError](#500)** | Processing errors, probably relating to backing services.
+  **[404 or StatusNotFoundError](#404)** | Resource not found
+
 
 
 **Sample 500 Response**
 
 ```json
 {
-"message": "could not read game record from database"
+"message": "could not withdraw amount"
 },
 ```
+Above error represents processing errors
 
-**Sample 400 request**
+**Sample 400 Response**
 ```json
 {
-"message":"could not parse request. check usage"
+"message":"could not withdraw amount due to insufficient balance"
 }
 ```
-Above error occurs mostly from bad requests in request body
+Above error occurs when user does ot have enough balance in account for a withdrawal
 
 ```json
 {
-"message":"no record found for username given"
+"message":"could not parse request. check API documentation"
 }
 ```
+Above error occurs when there is a missing request body field, we suggest you look at the docs carefully when this happens
 
-Above error occurs mostly when a record is not found during filters and updates.
+**Sample 404 request**
+
+```json
+{
+"message":"account origin specified was not found"
+}
+```
+Above error occurs mostly when an account resource is not found
 
