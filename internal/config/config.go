@@ -14,3 +14,12 @@ func LoadNormalConfig() error {
 
 	return nil
 }
+
+func LoadTestConfig() error {
+	pathToEnvFile := "../../.env_test"
+	if _, err := os.Stat(pathToEnvFile); err == nil {
+		return godotenv.Load(pathToEnvFile)
+	}
+
+	return nil
+}
