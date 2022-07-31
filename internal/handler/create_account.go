@@ -10,10 +10,10 @@ import (
 )
 
 type CreateAccountRequest struct {
-	ID        string      `json:"id" gorm:"default:gen_random_uuid()"`
-	Name      string      `json:"name" binding:"required"`
-	Balance   int64 `json:"balance" binding:"required"`
-	CreatedAt time.Time   `json:"created_at" sql:"type:timestamp without time zone"`
+	ID        string    `json:"id" gorm:"default:gen_random_uuid()"`
+	Name      string    `json:"name" binding:"required"`
+	Balance   int64     `json:"balance" binding:"required"`
+	CreatedAt time.Time `json:"created_at" sql:"type:timestamp without time zone"`
 }
 
 func (h *Handler) CreateAccount(c *gin.Context) {

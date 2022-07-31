@@ -10,8 +10,8 @@ import (
 )
 
 type WithdrawFromAccountRequest struct {
-	ID     string      `json:"id" gorm:"default:gen_random_uuid()" binding:"required"`
-	Amount int64 `json:"amount" binding:"required"`
+	ID     string `json:"id" gorm:"default:gen_random_uuid()" binding:"required"`
+	Amount int64  `json:"amount" binding:"required,gt=0"`
 }
 
 func (h *Handler) WithdrawFromAccount(c *gin.Context) {

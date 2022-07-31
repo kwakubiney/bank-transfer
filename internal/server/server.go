@@ -29,6 +29,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 	s.e.POST("/createAccount", s.h.CreateAccount)
 	s.e.POST("/withdraw", s.h.WithdrawFromAccount)
 	s.e.POST("/deposit", s.h.DepositToAccount)
+	s.e.POST("/transfer", s.h.TransferToAccount)
 
 	return s.e
 }
