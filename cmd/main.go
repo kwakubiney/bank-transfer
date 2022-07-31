@@ -16,7 +16,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db , err := postgres.Init()
+	db, err := postgres.Init()
 	if err != nil {
 		log.Fatal(err)
 	}

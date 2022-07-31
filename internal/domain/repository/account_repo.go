@@ -7,19 +7,20 @@ import (
 
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
 	"gorm.io/gorm"
+	"time"
 )
 
 var (
-	ErrAccountNotFound       = errors.New("account not found")
-	ErrAccountOriginNotFound = errors.New("account origin not found")
+	ErrAccountNotFound        = errors.New("account not found")
+	ErrAccountOriginNotFound  = errors.New("account origin not found")
 	ErrAccountCannotBeCreated = errors.New("account cannot be created")
-	
 )
+
 type AccountRepository struct {
 	db *gorm.DB
 }
 
-func NewAccountRepository (db *gorm.DB) *AccountRepository{
+func NewAccountRepository(db *gorm.DB) *AccountRepository {
 	return &AccountRepository{
 		db,
 	}
@@ -32,8 +33,8 @@ func (a *AccountRepository) CreateAccount(account *model.Account) error {
 	return nil
 }
 
-func (a *AccountRepository) DepositToAccount(account *model.Account, amount model.Money)(model.Money, model.Money, error) {
-	db :=  a.db.Model(model.Account{}).Where("id = ?", account.ID).Find(&account)
+func (a *AccountRepository) DepositToAccount(account *model.Account, amount int64) (int64, int64, error) {
+	db := a.db.Model(model.Account{}).Find(&account)
 	if db.RowsAffected == 0 {
 		return 0, 0, ErrAccountOriginNotFound
 	}
@@ -41,7 +42,7 @@ func (a *AccountRepository) DepositToAccount(account *model.Account, amount mode
 	oldBalance := account.Balance
 	account.Deposit(amount)
 
-	err := db.Updates(&account).Error
+	err := db.Model(&account).Update("balance", account.Balance).Error
 	if err != nil {
 		log.Println(db.Error)
 		return 0, 0, err
@@ -50,8 +51,8 @@ func (a *AccountRepository) DepositToAccount(account *model.Account, amount mode
 	return oldBalance, newBalance, nil
 }
 
-func (a *AccountRepository) WithdrawFromAccount(account *model.Account, amount model.Money) (model.Money, model.Money, error) {
-	db :=  a.db.Model(model.Account{}).Where("id = ?", account.ID).Find(&account)
+func (a *AccountRepository) WithdrawFromAccount(account *model.Account, amount int64) (int64, int64, error) {
+	db := a.db.Model(model.Account{}).Find(&account)
 	if db.RowsAffected == 0 {
 		return 0, 0, ErrAccountOriginNotFound
 	}
@@ -62,7 +63,8 @@ func (a *AccountRepository) WithdrawFromAccount(account *model.Account, amount m
 		return 0, 0, err
 	}
 
-	err = db.Updates(&account).Error
+	account.LastModified = time.Now()
+	err = db.Model(&account).Update("balance", account.Balance).Error
 	if err != nil {
 		log.Println(db.Error)
 		return 0, 0, err
@@ -71,23 +73,18 @@ func (a *AccountRepository) WithdrawFromAccount(account *model.Account, amount m
 	return oldBalance, newBalance, nil
 }
 
-
-func (a *AccountRepository) UpdateBalance (account model.Account, action string){
+func (a *AccountRepository) UpdateBalance(account model.Account, action string) {
 
 }
 
-func (a *AccountRepository) FindAll (account model.Account){
+func (a *AccountRepository) FindAll(account model.Account) {
 	//
 }
 
-func (a *AccountRepository) FindAccountByID (account model.Account, id string){
+func (a *AccountRepository) FindAccountByID(account model.Account, id string) {
 	//
 }
 
-func (a *AccountRepository) FindBalanceByID (account model.Account, id string){
-	
+func (a *AccountRepository) FindBalanceByID(account model.Account, id string) {
+
 }
-
-
-
-

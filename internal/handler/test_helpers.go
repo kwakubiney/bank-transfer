@@ -2,10 +2,10 @@ package handler
 
 import (
 	"bytes"
-	"github.com/jaswdr/faker"
-	"gorm.io/gorm"
-	"github.com/stretchr/testify/assert"
 	"encoding/json"
+	"github.com/jaswdr/faker"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -17,8 +17,6 @@ import (
 
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
 	"github.com/kwakubiney/bank-transfer/internal/postgres"
-
-	
 )
 
 var dbConnPool *gorm.DB
@@ -65,15 +63,14 @@ func SeedDB(r ...interface{}) *gorm.DB {
 	return dbConnPool
 }
 
-func CreateTestAccount(t *testing.T) (*model.Account) {
+func CreateTestAccount(t *testing.T) *model.Account {
 	f := faker.New()
 
 	testAccount := model.Account{
-		ID: NewUUID(),
-		Name: f.Internet().User(),
-		Balance: model.Money(f.Int64()),
+		ID:        NewUUID(),
+		Name:      f.Internet().User(),
+		Balance:   200,
 		CreatedAt: time.Now(),
-
 	}
 
 	return &testAccount

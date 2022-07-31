@@ -1,19 +1,19 @@
 package handler
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
 	"github.com/kwakubiney/bank-transfer/internal/domain/repository"
+	"log"
+	"net/http"
+	"time"
 )
 
 type CreateAccountRequest struct {
-	ID            string      `json:"id" gorm:"default:gen_random_uuid()"`
-	Name          string      `json:"name" binding:"required"`
-	Balance       model.Money `json:"balance" binding:"required"`
-	CreatedAt     time.Time   `json:"created_at" sql:"type:timestamp without time zone"`
+	ID        string      `json:"id" gorm:"default:gen_random_uuid()"`
+	Name      string      `json:"name" binding:"required"`
+	Balance   int64 `json:"balance" binding:"required"`
+	CreatedAt time.Time   `json:"created_at" sql:"type:timestamp without time zone"`
 }
 
 func (h *Handler) CreateAccount(c *gin.Context) {
@@ -21,6 +21,7 @@ func (h *Handler) CreateAccount(c *gin.Context) {
 	var createAccountRequest CreateAccountRequest
 	err := c.BindJSON(&createAccountRequest)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "could not parse request. check API documentation",
 		})
@@ -33,7 +34,7 @@ func (h *Handler) CreateAccount(c *gin.Context) {
 	account.LastModified = time.Now()
 
 	err = h.AccountRepo.CreateAccount(&account)
-	if err == repository.ErrAccountCannotBeCreated{
+	if err == repository.ErrAccountCannotBeCreated {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "could not create account",
 		})

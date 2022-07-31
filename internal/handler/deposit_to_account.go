@@ -11,8 +11,8 @@ import (
 )
 
 type DepositToAccountRequest struct {
-	ID            string      `json:"id" gorm:"default:gen_random_uuid()" binding:"required"`
-	Amount       model.Money `json:"amount" binding:"required"`
+	ID     string      `json:"id" gorm:"default:gen_random_uuid()" binding:"required"`
+	Amount int64 		`json:"amount" binding:"required"`
 }
 
 func (h *Handler) DepositToAccount(c *gin.Context) {
@@ -32,26 +32,25 @@ func (h *Handler) DepositToAccount(c *gin.Context) {
 	account.LastModified = time.Now()
 	amount := DepositToAccountRequest.Amount
 	oldBalance, newBalance, err := h.AccountRepo.DepositToAccount(&account, amount)
-	if err != nil{
-		if err == repository.ErrAccountOriginNotFound{
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "account origin specified was not found",
-		},)
-		return
-	}else{
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "could not deposit amount",
-		},)
+	if err != nil {
+		if err == repository.ErrAccountOriginNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "account origin specified was not found",
+			})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "could not deposit amount",
+			})
 
-		return	
+			return
+		}
 	}
-}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "amount successfully deposited",
+		"message":     "amount successfully deposited",
 		"old_balance": oldBalance,
 		"new_balance": newBalance,
-		"amount" : amount,
+		"amount":      amount,
 	})
 }
-

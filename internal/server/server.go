@@ -14,7 +14,7 @@ import (
 type Server struct {
 	e   *gin.Engine
 	srv http.Server
-	h *handler.Handler
+	h   *handler.Handler
 }
 
 func New(h *handler.Handler) *Server {
