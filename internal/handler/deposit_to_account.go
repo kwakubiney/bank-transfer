@@ -11,8 +11,8 @@ import (
 )
 
 type DepositToAccountRequest struct {
-	ID     string      `json:"id" gorm:"default:gen_random_uuid()" binding:"required"`
-	Amount int64 		`json:"amount" binding:"required"`
+	ID     string `json:"id" gorm:"default:gen_random_uuid()" binding:"required"`
+	Amount int64  `json:"amount" binding:"required,gt=0"`
 }
 
 func (h *Handler) DepositToAccount(c *gin.Context) {
