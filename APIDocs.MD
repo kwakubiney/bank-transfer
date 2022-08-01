@@ -74,6 +74,75 @@
 ```
 
 
+### Deposit to account
+
+**Sample Request**
+
+- `POST /deposit"`
+
+- `Content-type:` application/json
+
+- `Sample request JSON body:`
+
+```json
+{
+"id": "95d694d0-941d-40bf-84d9-3c31b5554be9",
+"amount":   2000,
+}
+```
+
+|     **Key**    | **Type** | **Remarks** |
+|:--------------:|:--------:|:-----------:|
+| `id` | `string` | required  |
+| `amount` | `int64` | required  |
+
+
+**Sample Response**
+
+```json
+{
+"amount": 10,
+"message": "amount successfully deposited",
+"new_balance": 4000,
+"old_balance": 2000
+}
+```
+
+
+### Transfer to another account
+
+**Sample Request**
+
+- `POST /transfer"`
+
+- `Content-type:` application/json
+
+- `Sample request JSON body:`
+
+```json
+{
+"origin": "95d694d0-941d-40bf-84d9-3c31b5554be9",
+"destination": "95ff94d0-941d-40bf-8rd9-3c31b3214be9",
+"amount": 2000
+}
+```
+
+|     **Key**    | **Type** | **Remarks** |
+|:--------------:|:--------:|:-----------:|
+| `origin` | `string` | required  |
+| `destination` | `string` | required  |
+| `amount` | `int64` | required  |
+
+
+**Sample Response**
+
+```json
+{
+"account_destination_id":"95ff94d0-941d-40bf-8rd9-3c31b3214be9" ,
+"account_origin_id": "95d694d0-941d-40bf-84d9-3c31b5554be9",
+"amount": 2000,
+}
+```
 
 ## Error HTTP Status Codes
 

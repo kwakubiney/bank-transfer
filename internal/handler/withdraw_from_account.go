@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
@@ -15,7 +16,7 @@ type WithdrawFromAccountRequest struct {
 }
 
 func (h *Handler) WithdrawFromAccount(c *gin.Context) {
-	//TODO: Make changes to transaction table
+	var transaction model.Transaction
 	var account model.Account
 	var WithdrawFromAccountRequest WithdrawFromAccountRequest
 	err := c.BindJSON(&WithdrawFromAccountRequest)
@@ -29,6 +30,7 @@ func (h *Handler) WithdrawFromAccount(c *gin.Context) {
 
 	account.ID = WithdrawFromAccountRequest.ID
 
+	//TODO: Make withdrawal and creation of transaction atomic.
 	amount := WithdrawFromAccountRequest.Amount
 	oldBalance, newBalance, err := h.AccountRepo.WithdrawFromAccount(&account, amount)
 	if err != nil {
@@ -50,6 +52,22 @@ func (h *Handler) WithdrawFromAccount(c *gin.Context) {
 
 			return
 		}
+	}
+
+	transaction.Amount = amount
+	transaction.CreatedAt= time.Now()
+	transaction.Debit = WithdrawFromAccountRequest.ID
+
+	err = h.TransactionRepo.CreateTransaction(
+		&transaction,
+	)
+
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "could not deposit amount",
+		})
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{

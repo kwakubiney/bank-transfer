@@ -25,8 +25,9 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	repo := repository.NewAccountRepository(db)
-	handler := handler.NewHandler(repo)
+	accountRepo := repository.NewAccountRepository(db)
+	transactionRepo := repository.NewTransactionRepository(db)
+	handler := handler.NewHandler(accountRepo, transactionRepo)
 	server := server.New(handler)
 	engine = server.SetupRoutes()
 	os.Exit(m.Run())

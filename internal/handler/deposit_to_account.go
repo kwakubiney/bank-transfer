@@ -16,8 +16,8 @@ type DepositToAccountRequest struct {
 }
 
 func (h *Handler) DepositToAccount(c *gin.Context) {
-	//TODO: Make changes to transaction table
 	var account model.Account
+	var transaction model.Transaction
 	var DepositToAccountRequest DepositToAccountRequest
 	err := c.BindJSON(&DepositToAccountRequest)
 	if err != nil {
@@ -31,6 +31,8 @@ func (h *Handler) DepositToAccount(c *gin.Context) {
 	account.ID = DepositToAccountRequest.ID
 	account.LastModified = time.Now()
 	amount := DepositToAccountRequest.Amount
+
+	//TODO: Make deposit and creation of transaction atomic.
 	oldBalance, newBalance, err := h.AccountRepo.DepositToAccount(&account, amount)
 	if err != nil {
 		if err == repository.ErrAccountOriginNotFound {
@@ -46,6 +48,23 @@ func (h *Handler) DepositToAccount(c *gin.Context) {
 			return
 		}
 	}
+
+	transaction.Amount = amount
+	transaction.CreatedAt= time.Now()
+	transaction.Credit = DepositToAccountRequest.ID
+
+	err = h.TransactionRepo.CreateTransaction(
+		&transaction,
+	)
+
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "could not deposit amount",
+		})
+		return
+	}
+
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message":     "amount successfully deposited",
