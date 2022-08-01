@@ -144,6 +144,57 @@
 }
 ```
 
+
+### Find all transactions for a given ID
+
+**Sample Request**
+
+- `GET /transactions?id=<account_id>"`
+
+- `Content-type:` application/json
+
+
+|     **query string**    | **Type** | **Remarks** |
+|:--------------:|:--------:|:-----------:|
+| `id` | `string` | required  |
+
+**Sample Response**
+
+```json
+{
+"account_destination_id":"95ff94d0-941d-40bf-8rd9-3c31b3214be9" ,
+"account_origin_id": "95d694d0-941d-40bf-84d9-3c31b5554be9",
+"amount": 2000,
+}
+```
+### Find all withdrawals(debits) and deposits(credit) for a user
+
+**Sample Request**
+
+- `GET /transactions/filter?credit=<account_id>"`
+
+- `Content-type:` application/json
+
+
+|     **query string**    | **Type** | **Remarks** |
+|:--------------:|:--------:|:-----------:|
+| `credit` | `string` | optional  | Depending on if you want to find deposits
+| `debit` | `string` | optional  | Depending on if you want to find withdrawals
+
+**Sample Response**
+
+```json
+{
+"message": "transactions successfully retreived",
+"transactions": {
+"id": "85cce29b-cfa4-4185-a617-f0ccf2edf60b",
+"credit": "ebb18d44-8d19-44bf-8a87-b8015411f3ab",
+"debit": "",
+"amount": 1000000,
+"created_at": "2022-08-01T01:14:06.055102Z"
+    }
+}
+```
 ## Error HTTP Status Codes
 
  **Error Codes**                              | **Meaning**

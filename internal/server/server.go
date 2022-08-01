@@ -30,6 +30,8 @@ func (s *Server) SetupRoutes() *gin.Engine {
 	s.e.POST("/withdraw", s.h.WithdrawFromAccount)
 	s.e.POST("/deposit", s.h.DepositToAccount)
 	s.e.POST("/transfer", s.h.TransferToAccount)
+	s.e.GET("/transaction", s.h.FindAllTransactions)
+	s.e.GET("/transaction/filter", s.h.FindTransaction)
 
 	return s.e
 }

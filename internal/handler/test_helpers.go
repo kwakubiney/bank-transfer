@@ -76,6 +76,18 @@ func CreateTestAccount(t *testing.T) *model.Account {
 	return &testAccount
 }
 
+func CreateTestTransaction(t *testing.T) *model.Transaction {
+
+	testTransaction := model.Transaction{
+		ID:        NewUUID(),
+		Credit:     NewUUID(),
+		Debit:   NewUUID(),
+		Amount: faker.New().Int64(),
+		CreatedAt: time.Now(),
+	}
+	return &testTransaction
+}
+
 func BootstrapServer(req *http.Request, routeHandlers *gin.Engine) *httptest.ResponseRecorder {
 	responseRecorder := httptest.NewRecorder()
 	routeHandlers.ServeHTTP(responseRecorder, req)
@@ -83,13 +95,16 @@ func BootstrapServer(req *http.Request, routeHandlers *gin.Engine) *httptest.Res
 }
 
 func MakeTestRequest(t *testing.T, route string, body interface{}, method string) *http.Request {
+	if body == nil {
+		req, err := http.NewRequest(method, route, nil)
+		assert.NoError(t, err)
+		return req
+	}
+
 	reqBody, err := json.Marshal(body)
 	assert.NoError(t, err)
-
 	req, err := http.NewRequest(method, route, bytes.NewReader(reqBody))
-
 	assert.NoError(t, err)
-
 	return req
 }
 
