@@ -21,8 +21,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repo := repository.NewAccountRepository(db)
-	handlers := handler.NewHandler(repo)
+	accountRepo := repository.NewAccountRepository(db)
+	transactionRepo := repository.NewTransactionRepository(db)
+
+	handlers := handler.NewHandler(accountRepo, transactionRepo)
 	server := server.New(handlers)
 	server.Start()
 }

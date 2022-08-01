@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
@@ -16,6 +17,7 @@ type TransferRequest struct {
 }
 
 func (h *Handler) TransferToAccount(c *gin.Context) {
+	var transaction model.Transaction
 	var transferRequest TransferRequest
 	err := c.BindJSON(&transferRequest)
 	if err != nil {
@@ -46,6 +48,7 @@ func (h *Handler) TransferToAccount(c *gin.Context) {
 		}
 	}
 
+		//TODO: Make transfer and creation of transaction atomic.
 	err = h.AccountRepo.UpdateBalanceAfterTransfer(*originAccount, *destinationAccount, transferRequest.Amount)
 	if err != nil {
 		log.Println(err)
@@ -62,6 +65,24 @@ func (h *Handler) TransferToAccount(c *gin.Context) {
 		}
 		return
 	}
+
+	transaction.Amount = transferRequest.Amount
+	transaction.CreatedAt= time.Now()
+	transaction.Debit = originAccount.ID
+	transaction.Credit = destinationAccount.ID
+
+	err = h.TransactionRepo.CreateTransaction(
+		&transaction,
+	)
+
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "could not deposit amount",
+		})
+		return
+	}
+	
 
 	c.JSON(http.StatusCreated, gin.H{
 		"account_origin_id": transferRequest.OriginAccountID,
