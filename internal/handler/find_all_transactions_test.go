@@ -17,7 +17,6 @@ func TestFindAllTransactionsEndpoint200(t *testing.T) {
 	response := handler.BootstrapServer(req, engine)
 	responseBody := handler.DecodeResponse(t, response)
 
-	// Type cast since json.Unmarshal converts JSON numbers to floats.
 	assert.Equal(t, "transactions successfully retreived",
 	responseBody["message"])
 }
@@ -32,7 +31,6 @@ func TestFindAllTransactionsEndpoint404(t *testing.T) {
 	response := handler.BootstrapServer(req, engine)
 	responseBody := handler.DecodeResponse(t, response)
 
-	// Type cast since json.Unmarshal converts JSON numbers to floats.
 	assert.Equal(t, "no transaction found for account specified",
 	responseBody["message"])
 }
