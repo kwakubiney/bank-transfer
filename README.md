@@ -10,7 +10,7 @@ A REST API for a simple core banking system.
 
 - Run development database migrations with `goose postgres "postgresql://postgres:postgres@localhost:5432/bank?sslmode=disable" up` in the `internal/migrations` directory
   
-- Run database migrations with `goose postgres "postgresql://postgres:postgres@localhost:6000/bank_test?sslmode=disable" up` in the `internal/migrations` directory
+- Run test database migrations with `goose postgres "postgresql://postgres:postgres@localhost:6000/bank_test?sslmode=disable" up` in the `internal/migrations` directory
   
 - Check out APIDocs next ;)
 
