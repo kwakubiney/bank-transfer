@@ -19,7 +19,7 @@ services:
     build: .
     ports: 
       - "8000:8000"
-    volumes:
+    volumes: 
       - .:/build/
     depends_on:
       db:
@@ -28,9 +28,24 @@ services:
       - db
     env_file:
       - .env
+  
+  db_test:
+    image: 'postgres:latest'
+    ports:
+      - "6000:5432"
+    env_file:
+      - .env_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pg_data_test:/var/lib/postgresql/data
 
 volumes:
   pg_data: null
+  pg_data_test: null
 
 
 

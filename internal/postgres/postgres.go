@@ -25,7 +25,6 @@ func ConstructDatabaseURI() string {
 }
 
 func Init() (*gorm.DB, error) {
-
 	databaseUrl := ConstructDatabaseURI()
 
 	db, err := gorm.Open(postgres.Open(databaseUrl), &gorm.Config{
