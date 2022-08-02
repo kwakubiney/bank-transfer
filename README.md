@@ -4,7 +4,7 @@ A REST API for a simple core banking system.
 
 # Setting up
 
-- Create an `.env` file in root directory by cloning `.env_test` (change `POSTGRES_DB` to `bank` & `host` to `db` in `.env` file)
+- Create an `.env` file in root directory by cloning `.env_test` (change `POSTGRES_DB` to `bank` & `POSTGRES_HOST` to `db` in `.env` file)
 
 - Run `docker-compose up` to spin up web server, development database and test database.
 
