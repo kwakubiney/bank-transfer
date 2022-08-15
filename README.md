@@ -14,3 +14,8 @@ A REST API for a simple core banking system.
   
 - Check out APIDocs next ;)
 
+# TODO
+
+- Make database transactions across different repositories. Example: Writes to Accounts and Transaction repositories must be atomic to prevent inconsistencies.
+
+- Include retries with idempotency.
