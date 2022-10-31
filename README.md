@@ -18,4 +18,4 @@ A REST API for a simple core banking system.
 
 - [X] Make database transactions across different repositories. Example: Writes to Accounts and Transaction repositories must be atomic to prevent inconsistencies.
 
-- [] Include retries with idempotency.
+- [ ] Include retries with idempotency.
