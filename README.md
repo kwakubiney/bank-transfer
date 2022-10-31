@@ -8,9 +8,9 @@ A REST API for a simple core banking system.
 
 - Run `docker-compose up` to spin up web server, development database and test database.
 
-- Run development database migrations with `goose postgres "postgresql://postgres:postgres@localhost:5432/bank?sslmode=disable" up` in the `internal/migrations` directory
+- Run development database migrations with `make migrate-up` 
   
-- Run test database migrations with `goose postgres "postgresql://postgres:postgres@localhost:6000/bank_test?sslmode=disable" up` in the `internal/migrations` directory
+- Run test database migrations with `make test-migrate-up`
   
 - Check out APIDocs next ;)
 
@@ -18,4 +18,4 @@ A REST API for a simple core banking system.
 
 - Make database transactions across different repositories. Example: Writes to Accounts and Transaction repositories must be atomic to prevent inconsistencies.
 
-- Include retries with idempotency.
+- [] Include retries with idempotency.
