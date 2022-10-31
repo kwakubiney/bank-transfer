@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
 	"github.com/kwakubiney/bank-transfer/internal/domain/repository"
+	"gorm.io/gorm"
 )
 
 type TransferRequest struct {
@@ -48,8 +49,8 @@ func (h *Handler) TransferToAccount(c *gin.Context) {
 		}
 	}
 
-		//TODO: Make transfer and creation of transaction atomic.
-	err = h.AccountRepo.UpdateBalanceAfterTransfer(*originAccount, *destinationAccount, transferRequest.Amount)
+	tx := c.MustGet("db_trx").(*gorm.DB)
+	err = h.AccountRepo.WithTrx(tx).Transfer(*originAccount, *destinationAccount, transferRequest.Amount)
 	if err != nil {
 		log.Println(err)
 		if err == model.ErrInsufficientBalance {
@@ -67,11 +68,11 @@ func (h *Handler) TransferToAccount(c *gin.Context) {
 	}
 
 	transaction.Amount = transferRequest.Amount
-	transaction.CreatedAt= time.Now()
+	transaction.CreatedAt = time.Now()
 	transaction.Debit = originAccount.ID
 	transaction.Credit = destinationAccount.ID
 
-	err = h.TransactionRepo.CreateTransaction(
+	err = h.TransactionRepo.WithTrx(tx).CreateTransaction(
 		&transaction,
 	)
 
@@ -82,12 +83,11 @@ func (h *Handler) TransferToAccount(c *gin.Context) {
 		})
 		return
 	}
-	
 
 	c.JSON(http.StatusCreated, gin.H{
-		"account_origin_id": transferRequest.OriginAccountID,
+		"account_origin_id":      transferRequest.OriginAccountID,
 		"account_destination_id": transferRequest.DestinationAccountID,
-		"amount": transferRequest.Amount,
+		"amount":                 transferRequest.Amount,
 	})
 
 }

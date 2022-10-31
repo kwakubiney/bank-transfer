@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
 	"github.com/kwakubiney/bank-transfer/internal/domain/repository"
+	"gorm.io/gorm"
 )
 
 type WithdrawFromAccountRequest struct {
@@ -30,9 +31,9 @@ func (h *Handler) WithdrawFromAccount(c *gin.Context) {
 
 	account.ID = WithdrawFromAccountRequest.ID
 
-	//TODO: Make withdrawal and creation of transaction atomic.
 	amount := WithdrawFromAccountRequest.Amount
-	oldBalance, newBalance, err := h.AccountRepo.WithdrawFromAccount(&account, amount)
+	tx := c.MustGet("db_trx").(*gorm.DB)
+	oldBalance, newBalance, err := h.AccountRepo.WithTrx(tx).WithdrawFromAccount(&account, amount)
 	if err != nil {
 		if err == model.ErrInsufficientBalance {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -55,10 +56,10 @@ func (h *Handler) WithdrawFromAccount(c *gin.Context) {
 	}
 
 	transaction.Amount = amount
-	transaction.CreatedAt= time.Now()
+	transaction.CreatedAt = time.Now()
 	transaction.Debit = WithdrawFromAccountRequest.ID
 
-	err = h.TransactionRepo.CreateTransaction(
+	err = h.TransactionRepo.WithTrx(tx).CreateTransaction(
 		&transaction,
 	)
 
