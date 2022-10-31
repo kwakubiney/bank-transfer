@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/kwakubiney/bank-transfer/internal/handler"
+	"github.com/kwakubiney/bank-transfer/internal/middlewares"
 )
 
 type Server struct {
@@ -27,9 +28,9 @@ func New(h *handler.Handler) *Server {
 func (s *Server) SetupRoutes() *gin.Engine {
 	s.e.GET("/healthCheck", s.h.HealthCheck)
 	s.e.POST("/createAccount", s.h.CreateAccount)
-	s.e.POST("/withdraw", s.h.WithdrawFromAccount)
-	s.e.POST("/deposit", s.h.DepositToAccount)
-	s.e.POST("/transfer", s.h.TransferToAccount)
+	s.e.POST("/withdraw", middlewares.DBTransactionMiddleware(s.h.AccountRepo.DB), s.h.WithdrawFromAccount)
+	s.e.POST("/deposit", middlewares.DBTransactionMiddleware(s.h.AccountRepo.DB), s.h.DepositToAccount)
+	s.e.POST("/transfer", middlewares.DBTransactionMiddleware(s.h.AccountRepo.DB), s.h.TransferToAccount)
 	s.e.GET("/transaction", s.h.FindAllTransactions)
 	s.e.GET("/transaction/filter", s.h.FindTransaction)
 

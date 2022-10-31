@@ -10,7 +10,7 @@ import (
 	"github.com/kwakubiney/bank-transfer/internal/domain/repository"
 )
 
-type FindAllTransferRequest struct{
+type FindAllTransferRequest struct {
 	ID string `form:"id" `
 }
 
@@ -29,24 +29,21 @@ func (h *Handler) FindAllTransactions(c *gin.Context) {
 	newTransaction, err := h.TransactionRepo.FindAllTransactions(FindAllTransferRequest.ID, &transaction)
 	if err != nil {
 		log.Println(err)
-		if err == repository.ErrTransactionNotFound{
+		if err == repository.ErrTransactionNotFound {
 			c.JSON(http.StatusNotFound, gin.H{
 				"message": "no transaction found for account specified",
 			})
 			return
-		}else{
+		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": "service error",
 			})
 			return
-		}	
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "transactions successfully retreived",
+		"message":      "transactions successfully retreived",
 		"transactions": newTransaction,
 	})
 }
-
-
-

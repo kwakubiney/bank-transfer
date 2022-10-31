@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kwakubiney/bank-transfer/internal/domain/model"
 	"github.com/kwakubiney/bank-transfer/internal/domain/repository"
+	"gorm.io/gorm"
 )
 
 type DepositToAccountRequest struct {
@@ -32,8 +33,8 @@ func (h *Handler) DepositToAccount(c *gin.Context) {
 	account.LastModified = time.Now()
 	amount := DepositToAccountRequest.Amount
 
-	//TODO: Make deposit and creation of transaction atomic.
-	oldBalance, newBalance, err := h.AccountRepo.DepositToAccount(&account, amount)
+	tx := c.MustGet("db_trx").(*gorm.DB)
+	oldBalance, newBalance, err := h.AccountRepo.WithTrx(tx).DepositToAccount(&account, amount)
 	if err != nil {
 		if err == repository.ErrAccountOriginNotFound {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -50,10 +51,10 @@ func (h *Handler) DepositToAccount(c *gin.Context) {
 	}
 
 	transaction.Amount = amount
-	transaction.CreatedAt= time.Now()
+	transaction.CreatedAt = time.Now()
 	transaction.Credit = DepositToAccountRequest.ID
 
-	err = h.TransactionRepo.CreateTransaction(
+	err = h.TransactionRepo.WithTrx(tx).CreateTransaction(
 		&transaction,
 	)
 
@@ -65,7 +66,6 @@ func (h *Handler) DepositToAccount(c *gin.Context) {
 		return
 	}
 
-
 	c.JSON(http.StatusCreated, gin.H{
 		"message":     "amount successfully deposited",
 		"old_balance": oldBalance,
@@ -73,3 +73,5 @@ func (h *Handler) DepositToAccount(c *gin.Context) {
 		"amount":      amount,
 	})
 }
+
+

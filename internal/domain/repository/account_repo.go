@@ -18,7 +18,17 @@ var (
 )
 
 type AccountRepository struct {
-	db *gorm.DB
+	DB *gorm.DB
+}
+
+
+func (a *AccountRepository) WithTrx(trxHandle *gorm.DB) *AccountRepository {
+	if trxHandle == nil {
+		log.Print("Transaction Database not found")
+		return &AccountRepository{}
+	}
+	a.DB = trxHandle
+	return a
 }
 
 func NewAccountRepository(db *gorm.DB) *AccountRepository {
@@ -28,14 +38,14 @@ func NewAccountRepository(db *gorm.DB) *AccountRepository {
 }
 
 func (a *AccountRepository) CreateAccount(account *model.Account) error {
-	if a.db.Create(&account).Error != nil {
+	if a.DB.Create(&account).Error != nil {
 		return ErrAccountCannotBeCreated
 	}
 	return nil
 }
 
 func (a *AccountRepository) DepositToAccount(account *model.Account, amount int64) (int64, int64, error) {
-	db := a.db.Model(model.Account{}).Find(&account)
+	db := a.DB.Model(model.Account{}).Find(&account)
 	if db.RowsAffected == 0 {
 		return 0, 0, ErrAccountOriginNotFound
 	}
@@ -59,7 +69,7 @@ func (a *AccountRepository) DepositToAccount(account *model.Account, amount int6
 }
 
 func (a *AccountRepository) WithdrawFromAccount(account *model.Account, amount int64) (int64, int64, error) {
-	db := a.db.Model(model.Account{}).Find(&account)
+	db := a.DB.Model(model.Account{}).Find(&account)
 	if db.RowsAffected == 0 {
 		return 0, 0, ErrAccountOriginNotFound
 	}
@@ -89,45 +99,36 @@ func (a *AccountRepository) WithdrawFromAccount(account *model.Account, amount i
 func (a *AccountRepository) FindAccountByID(originID string, destinationID string) (*model.Account, *model.Account, error) {
 	var originAccount *model.Account
 	var destinationAccount *model.Account
-	db := a.db.Where("id = ?", originID).Find(&originAccount)
+	db := a.DB.Where("id = ?", originID).Find(&originAccount)
 	if db.RowsAffected == 0 {
 		return nil, nil, ErrAccountOriginNotFound
 	}
-	db = a.db.Where("id = ?", destinationID).Find(&destinationAccount)
+	db = a.DB.Where("id = ?", destinationID).Find(&destinationAccount)
 	if db.RowsAffected == 0 {
 		return nil, nil, ErrAccountDestinationNotFound
 	}
 	return originAccount, destinationAccount, nil
 }
 
-func (a *AccountRepository) UpdateBalanceAfterTransfer(origin model.Account, destination model.Account, amount int64) error {
-	// update balance of origin
+func (a *AccountRepository) Transfer(origin model.Account, destination model.Account, amount int64) error {
 	err := origin.Withdraw(amount)
 	if err != nil {
 		return err
 	}
 
-	tx := a.db.Begin()
-	err = tx.Model(&origin).Update("balance", origin.Balance).Error
+	err = a.DB.Model(&origin).Update("balance", origin.Balance).Error
 	if err != nil {
-		tx.Rollback()
 		log.Println(err)
 		return err
 	}
 
-	//update balance of destination
 	destination.Deposit(amount)
-	err = tx.Model(&destination).Update("balance", destination.Balance).Error
+	err = a.DB.Model(&destination).Update("balance", destination.Balance).Error
 	if err != nil {
-		tx.Rollback()
 		log.Println(err)
 		return err
 	}
 
-	err = tx.Commit().Error
-	if err != nil {
-		return err
-	}
 	//TODO: Update last modified on both accounts
 	return nil
 }

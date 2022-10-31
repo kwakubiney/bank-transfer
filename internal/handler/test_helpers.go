@@ -80,9 +80,9 @@ func CreateTestTransaction(t *testing.T) *model.Transaction {
 
 	testTransaction := model.Transaction{
 		ID:        NewUUID(),
-		Credit:     NewUUID(),
-		Debit:   NewUUID(),
-		Amount: faker.New().Int64(),
+		Credit:    NewUUID(),
+		Debit:     NewUUID(),
+		Amount:    faker.New().Int64(),
 		CreatedAt: time.Now(),
 	}
 	return &testTransaction

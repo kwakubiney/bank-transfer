@@ -18,9 +18,8 @@ func TestFindTransactionsEndpoint200(t *testing.T) {
 	responseBody := handler.DecodeResponse(t, response)
 
 	assert.Equal(t, "transactions successfully retreived",
-	responseBody["message"])
+		responseBody["message"])
 }
-
 
 func TestFindTransactionsEndpoint404(t *testing.T) {
 
@@ -31,5 +30,5 @@ func TestFindTransactionsEndpoint404(t *testing.T) {
 	response := handler.BootstrapServer(req, engine)
 	responseBody := handler.DecodeResponse(t, response)
 	assert.Equal(t, "no transaction found for filters specified",
-	responseBody["message"])
+		responseBody["message"])
 }

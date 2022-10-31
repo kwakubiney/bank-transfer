@@ -18,9 +18,8 @@ func TestFindAllTransactionsEndpoint200(t *testing.T) {
 	responseBody := handler.DecodeResponse(t, response)
 
 	assert.Equal(t, "transactions successfully retreived",
-	responseBody["message"])
+		responseBody["message"])
 }
-
 
 func TestFindAllTransactionsEndpoint404(t *testing.T) {
 
@@ -32,5 +31,5 @@ func TestFindAllTransactionsEndpoint404(t *testing.T) {
 	responseBody := handler.DecodeResponse(t, response)
 
 	assert.Equal(t, "no transaction found for account specified",
-	responseBody["message"])
+		responseBody["message"])
 }
